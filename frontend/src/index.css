@@ -1,0 +1,15 @@
+/* @import "tailwindcss"; */
+
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+
+@import "tailwindcss";
+
+body {
+  background-color: #2e0e01 !important;
+  color: #ffffff;
+  margin: 0;
+}
+
+
