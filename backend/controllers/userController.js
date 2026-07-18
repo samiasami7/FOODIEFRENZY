@@ -32,7 +32,8 @@ const loginUser = async (req , res) => {
 
 // Create Token
 const createToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET)
+    const secret = process.env.JWT_SECRET || 'foodiefrenzy-secret';
+    return jwt.sign({ id }, secret, { expiresIn: '7d' })
 }
 
 // REGISTER FUNCTION
