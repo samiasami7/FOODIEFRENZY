@@ -45,6 +45,8 @@ import cors from 'cors';
 import 'dotenv/config';
 import userRouter from './routes/userRoute.js';
 import itemRouter from './routes/itemRoutes.js';
+
+import cartRouter from './routes/cartRoute.js';
 import { connectDB } from './config/db.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -81,6 +83,7 @@ const startServer = async () => {
     app.use('/api/user', userRouter);
     app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
     app.use('/api/items', itemRouter);
+    app.use('/api/cart', cartRouter);
     
     app.get('/', (req, res) => {
       res.send('API WORKING');

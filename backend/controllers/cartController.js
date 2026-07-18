@@ -1,5 +1,5 @@
 import asyncHandler from 'express-async-handler'
-import { CartItem } from '../modals/cartModal.js'
+import { CartItem } from '../modals/cartModals.js'
 
 // GET CART
 export const getCart = asyncHandler(async (req, res) => {
@@ -13,38 +13,31 @@ export const getCart = asyncHandler(async (req, res) => {
     res.json(formatted)
 })
 
-// ADDTO CART FUCTION TO ADD ITEMS TO CART
-export const addToCart = asyncHandler(async (req, res) => {
-    const {itemId, quantity} = req.body;
-    if(!itemId || typeof quantity !== 'number') {
-        res.status(400);
-        throw new Error('itemId and quantity are required')
-    }
-})
+// ADDTO CART FUNCTION TO ADD ITEMS TO CART
 export const addToCart = asyncHandler(async (req, res) => {
     const { itemId, quantity } = req.body;
     if (!itemId || typeof quantity !== 'number') {
         res.status(400);
         throw new Error('itemId and quantity are required');
     }
+
     let cartItem = await CartItem.findOne({ user: req.user._id, item: itemId });
     if (cartItem) {
-        cartItem.quantity = Math.max(1, cartItem.quantity + quantity)
+        cartItem.quantity = Math.max(1, cartItem.quantity + quantity);
 
         if (cartItem.quantity < 1) {
             await cartItem.remove();
-            return res,json({ _id: cartitem._id.toString(), item: cartItem.item, quantity: 0 })
-        }  
+            return res.status(200).json({ _id: cartItem._id.toString(), item: cartItem.item, quantity: 0 });
+        }
+
         await cartItem.save();
         await cartItem.populate('item');
-        return res.status(200).json({ _id: cartItem._id.toString(), item: cartItem.item, quantity: cartItem.quantity }) 
- 
+        return res.status(200).json({ _id: cartItem._id.toString(), item: cartItem.item, quantity: cartItem.quantity });
     }
-    cartItem = await CartItem.create({ user: req.user._id, item: itemId, quantity, })
 
-
+    cartItem = await CartItem.create({ user: req.user._id, item: itemId, quantity });
     await cartItem.populate('item');
-    res.status(201).json({ _id: cartItem._id.toString(), item: cartItem.item, quantity: cartItem.quantity, })
+    res.status(201).json({ _id: cartItem._id.toString(), item: cartItem.item, quantity: cartItem.quantity });
 })
 
 //create a method to update cart and item quantity
