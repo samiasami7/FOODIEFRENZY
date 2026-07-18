@@ -172,10 +172,10 @@
 import React from 'react';
 import Navbar from '../../components/Navbar/Navbar';
 import Hero from '../../components/Hero';
-import Footer from '../../components/Footer'; // <--- 1. ADD THIS IMPORT LINE HERE
+import Footer from '../../components/Footer'; 
 import Contact from '../../components/Contact';
 import About from '../../components/About';
-
+import Menu from '../../Menu'; // <-- FIXED: Pointing directly to the root src folder
 
 const Home = () => {
   return (
@@ -186,11 +186,13 @@ const Home = () => {
       {/* Center Landing Page Graphics Area */}
       <Hero />
       
-      <About/>
+      <Menu />
+
+      <About />
 
       <Contact />
 
-      {/* 2. MOUNT THE FOOTER AT THE VERY BOTTOM */}
+      {/* Mount Footer at the bottom */}
       <Footer />
     </div>
   );

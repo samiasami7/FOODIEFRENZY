@@ -15,16 +15,25 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // DATABASE
-console.log("Connecting database...");
-connectDB();
+const startServer = async () => {
+    try {
+        console.log("Connecting database...");
+        await connectDB();
 
-// ROUTES
-app.use('/api/user', userRouter);
+        // ROUTES
+        app.use('/api/user', userRouter);
 
-app.get('/', (req, res) => {
-    res.send('API WORKING');
-});
+        app.get('/', (req, res) => {
+            res.send('API WORKING');
+        });
 
-app.listen(port, () => {
-    console.log(`Server Started on http://localhost:${port}`);
-});
+        app.listen(port, () => {
+            console.log(`Server Started on http://localhost:${port}`);
+        });
+    } catch (error) {
+        console.error('Failed to start server:', error.message);
+        process.exit(1);
+    }
+};
+
+startServer();
