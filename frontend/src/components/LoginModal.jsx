@@ -683,10 +683,9 @@ export default function LoginModal({ isOpen, onClose }) {
     setSuccessMessage('');
     setIsLoading(true);
 
-    const apiBaseUrl = 'http://localhost:5000';
     const endpoint = isLoginView
-      ? `${apiBaseUrl}/api/user/login`
-      : `${apiBaseUrl}/api/user/register`;
+      ? '/api/user/login'
+      : '/api/user/register';
 
     const payload = isLoginView
       ? { email, password, role }
