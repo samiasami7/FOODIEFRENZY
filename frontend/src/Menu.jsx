@@ -260,51 +260,6 @@ const foodItems = [
   }
 ];
 
-// export default function Menu() {
-//   return (
-//     <section style={{ padding: '3rem 0', backgroundColor: '#B0BA99' }} id="menu">
-//       <div style={{ maxWidth: '80rem', margin: '0 auto', padding: '0 1rem' }}>
-        
-//         <h2 style={{ fontSize: '1.875rem', fontWeight: '700', textAlign: 'center', color: '#1f2937', marginBottom: '0.5rem' }}>
-//           {"Our Delicious Menu"}
-//         </h2>
-//         <p style={{ textAlign: 'center', color: '#6b7280', marginBottom: '2.5rem', maxWidth: '28rem', marginLeft: 'auto', marginRight: 'auto', fontSize: '0.875rem' }}>
-//           {"Explore our wide collection of premium handcrafted meals, artisan pizzas, and sweet refreshments."}
-//         </p>
-
-//         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1.5rem' }}>
-//           {foodItems.map((item) => (
-//             <div 
-//               key={item.id} 
-//               style={{ backgroundColor: '#B0BA99', borderRadius: '0.5rem', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'between' }}
-//             >
-//               <div>
-//                 <div style={{ overflow: 'hidden' }}>
-//                   <img 
-//                     src={item.image} 
-//                     alt={item.name} 
-//                     style={{ width: '100%', height: '12rem', objectFit: 'cover' }}
-//                     loading="lazy"
-//                   />
-//                 </div>
-                
-//                 <div style={{ padding: '1rem' }}>
-//                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.5rem', gap: '0.5rem' }}>
-//                     <h3 style={{ fontWeight: '600', fontSize: '1rem', color: '#1f2937', margin: 0 }}>{item.name}</h3>
-//                     <span style={{ color: '#ef4444', fontWeight: '700' }}>{item.price}</span>
-//                   </div>
-// <p style={{ color: '#4b5563', fontSize: '0.75rem', margin: 0 }}>{item.description}</p>
-//                 </div>
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-//     </section>
-//   );
-// }
-
-
 export default function Menu() {
   // 1. ADD THESE STATE HOOKS AT THE TOP OF THE FUNCTION
   const [cart, setCart] = useState([]);
@@ -321,7 +276,16 @@ export default function Menu() {
           cartItem.id === item.id ? { ...cartItem, quantity: cartItem.quantity + 1 } : cartItem
         );
       }
-      return [...prevCart, { id: item.id, name: item.name, price: numericPrice, quantity: 1 }];
+      return [
+  ...prevCart,
+  {
+    id: item.id,
+    name: item.name,
+    price: numericPrice,
+    quantity: 1,
+    note: ""
+  }
+];
     });
   };
 
@@ -333,6 +297,12 @@ export default function Menu() {
     );
   };
 
+  // Add this helper function below your other cart state functions
+const updateItemNote = (id, newNoteText) => {
+  setCart((prevCart) =>
+    prevCart.map((item) => (item.id === id ? { ...item, note: newNoteText } : item))
+  );
+};
   const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const handlePlaceOrder = async (e) => {
@@ -345,14 +315,35 @@ export default function Menu() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customerName,
-          customerPhone,
-          items: cart,
-          totalAmount: parseFloat(totalAmount.toFixed(2))
-        })
+  customerName,
+  customerPhone,
+
+  items: cart.map((item) => ({
+    id: item.id,
+    name: item.name,
+    quantity: item.quantity,
+    price: item.price,
+    preferenceNote: item.note
+  })),
+
+  totalAmount: parseFloat(totalAmount.toFixed(2))
+})
       });
 
-      const data = await response.json();
+    
+
+const text = await response.text();
+console.log(text);
+
+let data;
+
+try {
+  data = JSON.parse(text);
+} catch {
+  console.log("Server returned HTML instead of JSON:");
+  console.log(text);
+  return;
+}
       if (data.success) {
         alert('Order successfully saved to MongoDB database!');
         setCart([]);
@@ -362,9 +353,9 @@ export default function Menu() {
         alert('Error saving order: ' + data.message);
       }
     } catch (err) {
-      console.error(err);
-      alert('Could not establish backend server connectivity.');
-    }
+  console.error("FULL ERROR:", err);
+  alert(err.message);
+}
   };
 
   return (
@@ -426,23 +417,90 @@ export default function Menu() {
             <p style={{ textAlign: 'center', color: '#6b7280', margin: '2rem 0' }}>Your order is empty. Choose foods from above!</p>
           ) : (
             <div style={{ marginBottom: '1.5rem' }}>
-              {cart.map((cartItem) => (
-                <div key={cartItem.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0', borderBottom: '1px solid #e5e7eb' }}>
-                  <div>
-                    <span style={{ fontWeight: '600', color: '#111827' }}>{cartItem.name}</span>
-                    <span style={{ fontSize: '0.85rem', color: '#6b7280', marginLeft: '0.5rem' }}>({cartItem.quantity}x)</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <span style={{ fontWeight: '500' }}>${(cartItem.price * cartItem.quantity).toFixed(2)}</span>
-                    <button 
-                      onClick={() => removeFromCart(cartItem.id)}
-                      style={{ backgroundColor: '#fee2e2', color: '#ef4444', border: 'none', padding: '0.2rem 0.5rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-                    >
-                      -
-                    </button>
-                  </div>
-                </div>
-              ))}
+            {cart.map((item) => (
+  <div
+    key={item.id}
+    style={{
+      borderBottom: "1px solid rgba(0,0,0,0.08)",
+      paddingBottom: "12px",
+      marginBottom: "12px",
+    }}
+  >
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+      }}
+    >
+      <div>
+        <span style={{ fontWeight: "600" }}>
+          {item.name}
+        </span>
+
+        <span
+          style={{
+            marginLeft: "5px",
+            color: "#666",
+            fontSize: "14px",
+          }}
+        >
+          ({item.quantity}x)
+        </span>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+        }}
+      >
+        <span>
+          ${(item.price * item.quantity).toFixed(2)}
+        </span>
+
+        <button
+          type="button"
+          onClick={() => removeFromCart(item.id)}
+          style={{
+            background: "#ef4444",
+            color: "white",
+            border: "none",
+            width: "25px",
+            height: "25px",
+            cursor: "pointer",
+          }}
+        >
+          -
+        </button>
+      </div>
+    </div>
+
+    <div
+      style={{
+        display: "flex",
+        marginTop: "8px",
+        gap: "8px",
+      }}
+    >
+      <span>Note:</span>
+
+      <input
+        type="text"
+        placeholder="Your preferences or special instructions"
+        value={item.note}
+        onChange={(e) =>
+          updateItemNote(item.id, e.target.value)
+        }
+        style={{
+          flex: 1,
+          padding: "6px",
+        }}
+      />
+    </div>
+  </div>
+))}
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem', fontSize: '1.2rem', fontWeight: '700', color: '#111827' }}>
                 <span>Total Amount:</span>
                 <span style={{ color: '#dc2626' }}>${totalAmount.toFixed(2)}</span>

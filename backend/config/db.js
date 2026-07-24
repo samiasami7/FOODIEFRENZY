@@ -25,7 +25,8 @@ export const connectDB = async () => {
             return { type: "atlas", uri: atlasUri };
         }
     } catch (error) {
-        console.warn("Primary DB connection failed. Trying local MongoDB:", error.message);
+        console.error("Atlas connection failed:");
+console.error(error);
     }
 
     try {
@@ -47,3 +48,21 @@ export const connectDB = async () => {
         throw fallbackError;
     }
 };
+
+
+
+// import mongoose from "mongoose";
+
+// export const connectDB = async () => {
+//   try {
+//     console.log("Connecting to:", process.env.MONGO_URL);
+
+//     await mongoose.connect(process.env.MONGO_URL);
+
+//     console.log("✅ Connected to MongoDB Atlas");
+//   } catch (error) {
+//     console.error("❌ Atlas connection failed:");
+//     console.error(error);
+//     process.exit(1);
+//   }
+// };
