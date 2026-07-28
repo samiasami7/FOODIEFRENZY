@@ -714,7 +714,7 @@ if (!response.ok || !data.success) {
       if (isLoginView) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('userEmail', email);
-        localStorage.setItem('userRole', role);
+        localStorage.setItem('userRole', data.role);
         window.dispatchEvent(new Event('auth-changed'));
         onClose();
       } else {
@@ -802,7 +802,7 @@ if (!response.ok || !data.success) {
             </div>
           </div>
 
-          <div style={{ marginBottom: '24px' }}>
+          {/* <div style={{ marginBottom: '24px' }}>
             <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: '#FFA726', textTransform: 'uppercase', marginBottom: '8px' }}>Select Role</label>
             <div style={{ display: 'flex', gap: '24px', backgroundColor: '#1A100E', padding: '12px', borderRadius: '8px', border: '1px solid #4E342E' }}>
               <label style={{ display: 'flex', alignItems: 'center', color: role === 'user' ? '#FF9800' : '#d1d5db', cursor: 'pointer', fontWeight: role === 'user' ? '600' : 'normal' }}>
@@ -814,7 +814,7 @@ if (!response.ok || !data.success) {
                 Admin Role
               </label>
             </div>
-          </div>
+          </div> */}
 
           {isLoginView && (
             <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'center' }}>

@@ -161,19 +161,28 @@ const Navbar = () => {
     { name: 'Contact', icon: '📞' }
   ];
 
-  useEffect(() => {
-    const syncAuth = () => setIsLoggedIn(Boolean(localStorage.getItem('token')));
-    syncAuth();
-    window.addEventListener('auth-changed', syncAuth);
-    return () => window.removeEventListener('auth-changed', syncAuth);
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userEmail');
-    setIsLoggedIn(false);
-    window.dispatchEvent(new Event('auth-changed'));
+  // 🌟 Update this block inside your Navbar.jsx file:
+useEffect(() => {
+  const syncAuth = () => {
+    // Re-verify token existence when state updates
+    setIsLoggedIn(Boolean(localStorage.getItem('token')));
   };
+  
+  syncAuth();
+  window.addEventListener('auth-changed', syncAuth);
+  return () => window.removeEventListener('auth-changed', syncAuth);
+}, []);
+
+
+  // 🌟 Make sure your logout handler looks like this:
+const handleLogout = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('userEmail');
+  localStorage.removeItem('userRole'); // Clear out the admin tracker right here
+  setIsLoggedIn(false);
+  window.dispatchEvent(new Event('auth-changed'));
+};
+
 
   return (
     <>

@@ -3,37 +3,36 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import validator from 'validator'
 
-
-//Login Function
+// Login Function
 const loginUser = async (req , res) => {
-    const {email,password}= req.body
+    const { email, password } = req.body
 
     try {
         const user = await userModel.findOne({ email })
         if(!user){
-            return res.json({success: false,message: "User doesn't exist"})
+            return res.json({ success: false, message: "User doesn't exist" })
         }
         const isMatch = await bcrypt.compare(password, user.password)
         if(!isMatch){
-            return res.json({success: false, message: "Invalid Creds"})
+            return res.json({ success: false, message: "Invalid Creds" })
         }
 
-        const token = createToken(user._id);
-        res.json({ success: true, token})
+        // Pass both ID and Role to token creation
+        const token = createToken(user._id, user.role);
+        
+        // Return success, token, and user role to React
+        res.json({ success: true, token, role: user.role })
     }
     catch(error){
         console.log(error)
-        res.json({ success:false, message: "Error"})
-
+        res.json({ success: false, message: "Error" })
     }
-    
-
 }
 
-// Create Token
-const createToken = (id) => {
+// Create Token (Updated payload to include role)
+const createToken = (id, role) => {
     const secret = process.env.JWT_SECRET || 'foodiefrenzy-secret';
-    return jwt.sign({ id }, secret, { expiresIn: '7d' })
+    return jwt.sign({ id, role }, secret, { expiresIn: '7d' })
 }
 
 // REGISTER FUNCTION
@@ -47,35 +46,41 @@ const registerUser = async (req, res) => {
         }
 
         // VALIDATION
-if (!validator.isEmail(email)) {
-    return res.json({ success: false, message: "Please Enter a valid Email" })
-}
+        if (!validator.isEmail(email)) {
+            return res.json({ success: false, message: "Please Enter a valid Email" })
+        }
 
-if (password.length < 8) {
-    return res.json({ success: false, message: "Please Enter a Strong Password" })
-}
-// IF EVERTHING WORKS
-const salt = await bcrypt.genSalt(10)
-const hashedPassword = await bcrypt.hash(password, salt)
+        if (password.length < 8) {
+            return res.json({ success: false, message: "Please Enter a Strong Password" })
+        }
+        
+        // IF EVERYTHING WORKS
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(password, salt)
 
-// NEW USER
-const newUser = new userModel({
-    username: username,
-    email:  email,
-    password: hashedPassword
-})
-const user = await newUser.save()
+        // 🌟 AUTOMATIC ADMIN TRACKER ASSIGNMENT
+        // Check if the current email matches your specified admin addresses
+        let assignedRole = 'user';
+        if (email.toLowerCase() === 'samia012@gmail.com' || email.toLowerCase() === 'sadia012@gmail.com') {
+            assignedRole = 'admin';
+        }
 
-const token = createToken(user._id)
-res.json({ success: true, token })
-}
+        // NEW USER WITH AUTOMATIC ROLE ASSIGNMENT
+        const newUser = new userModel({
+            username: username,
+            email: email,
+            password: hashedPassword,
+            role: assignedRole // Overwrites default 'user' if it's your admin email
+        })
+        const user = await newUser.save()
 
-
- catch(error){
+        const token = createToken(user._id, user.role)
+        res.json({ success: true, token, role: user.role })
+    }
+    catch(error){
         console.log(error)
-      res.json({ success: false, message:"Error" });
-
+        res.json({ success: false, message:"Error" });
     }
 }
 
-export{ loginUser , registerUser}
+export { loginUser, registerUser }
