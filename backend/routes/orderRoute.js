@@ -1,15 +1,19 @@
 import express from "express";
 
+import {
+    createOrder,
+    getAllOrders,
+    updateAnyOrder,
+} from "../controllers/orderController.js";
+
 const router = express.Router();
 
 console.log("orderRoute.js LOADED");
 
-router.post("/", (req, res) => {
-  console.log("POST /api/orders HIT");
-  res.json({
-    success: true,
-    message: "Route is working!"
-  });
-});
+router.post("/", createOrder);
+
+router.get("/getall", getAllOrders);
+
+router.put("/getall/:id", updateAnyOrder);
 
 export default router;

@@ -655,6 +655,7 @@
 import React, { useState } from 'react';
 
 export default function LoginModal({ isOpen, onClose }) {
+  const API_BASE_URL = import.meta.env.VITE_API_URL || '';
   const [isLoginView, setIsLoginView] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -684,12 +685,12 @@ export default function LoginModal({ isOpen, onClose }) {
     setIsLoading(true);
 
     const endpoint = isLoginView
-      ? '/api/user/login'
-      : '/api/user/register';
+      ? `${API_BASE_URL}/api/user/login`
+      : `${API_BASE_URL}/api/user/register`;
 
     const payload = isLoginView
-      ? { email, password, role }
-      : { username: name, email, password, role };
+      ? { email, password }
+      : { username: name, email, password };
 
     try {
       const response = await fetch(endpoint, {
