@@ -44,42 +44,53 @@
 
 
 
-import React from 'react';
-import Home from './pages/Home/Home';
-
-function App() {
-  return (
-    <div>
-      {/* Remove the extra <Navbar /> tag that was sitting here */}
-      <Home />
-    </div>
-  );
-}
-
-export default App;
-
-
-
-
-
-// import React, { useState } from 'react';
+// import React from 'react';
 // import Home from './pages/Home/Home';
-// import LoginModal from './components/LoginModal'; // 1. Import your login modal
 
 // function App() {
-//   // 2. Create state to control modal visibility
-//   const [isLoginOpen, setIsLoginOpen] = useState(false);
-
 //   return (
 //     <div>
-//       {/* 3. Pass the function to open the modal down to your Home page */}
-//       <Home openLogin={() => setIsLoginOpen(true)} />
-
-//       {/* 4. Render the modal at the root level */}
-//       <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+//       {/* Remove the extra <Navbar /> tag that was sitting here */}
+//       <Home />
 //     </div>
 //   );
 // }
 
 // export default App;
+
+
+
+
+
+import React, { useEffect, useState } from 'react';
+
+import Home from './pages/Home/Home';
+import AdminDashboard from './pages/AdminDashboard';
+
+function App() {
+
+  const [page, setPage] = useState(window.location.hash);
+
+  useEffect(() => {
+
+    const handleHashChange = () => {
+      setPage(window.location.hash);
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+
+  }, []);
+
+  return (
+    <div>
+      {page === '#admin' ? <AdminDashboard /> : <Home />}
+    </div>
+  );
+}
+
+export default App;
 
