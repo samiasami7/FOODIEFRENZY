@@ -40,10 +40,6 @@ import mangoimg from "./assets/mango.jpg";
 import cokeimg from "./assets/coke.jpg";
 import mintimg from "./assets/mint.jpg";
 
-// ======================================================
-// DEFAULT FOOD ITEMS
-// ======================================================
-
 const foodItems = [
   {
     id: 1,
@@ -303,21 +299,9 @@ const foodItems = [
   },
 ];
 
-// ======================================================
-// MENU COMPONENT
-// ======================================================
-
 export default function Menu() {
-  // ======================================================
-  // CART
-  // ======================================================
-
   const [cart, setCart] = useState([]);
   const [showOrderBox, setShowOrderBox] = useState(false);
-
-  // ======================================================
-  // OPEN ORDER BOX FROM NAVBAR CART
-  // ======================================================
 
   useEffect(() => {
     const openOrderBox = () => {
@@ -330,10 +314,6 @@ export default function Menu() {
       window.removeEventListener("open-order-box", openOrderBox);
     };
   }, []);
-
-  // ======================================================
-  // ADMIN FOOD ITEMS
-  // ======================================================
 
   const [adminFoods, setAdminFoods] = useState(() => {
     try {
@@ -354,22 +334,9 @@ export default function Menu() {
     }
   });
 
-  // ======================================================
-  // CUSTOMER INFORMATION
-  // ======================================================
-
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
-
-  // ======================================================
-  // PAYMENT METHOD
-  // ======================================================
-
   const [paymentMethod, setPaymentMethod] = useState("COD");
-
-  // ======================================================
-  // LOAD ADMIN FOODS
-  // ======================================================
 
   useEffect(() => {
     const loadAdminFoods = () => {
@@ -406,13 +373,8 @@ export default function Menu() {
     };
   }, []);
 
-  // ======================================================
-  // COMBINE DEFAULT + ADMIN FOODS
-  // ======================================================
-
   const allFoodItems = [
     ...foodItems,
-
     ...adminFoods.map((food) => ({
       id: `admin-${food.id}`,
       name: food.name,
@@ -423,10 +385,6 @@ export default function Menu() {
       image: food.image,
     })),
   ];
-
-  // ======================================================
-  // ADD TO CART
-  // ======================================================
 
   const addToCart = (item) => {
     const numericPrice =
@@ -463,10 +421,6 @@ export default function Menu() {
     });
   };
 
-  // ======================================================
-  // REMOVE FROM CART
-  // ======================================================
-
   const removeFromCart = (id) => {
     setCart((prevCart) =>
       prevCart
@@ -482,10 +436,6 @@ export default function Menu() {
     );
   };
 
-  // ======================================================
-  // UPDATE SPECIAL NOTE
-  // ======================================================
-
   const updateItemNote = (id, newNoteText) => {
     setCart((prevCart) =>
       prevCart.map((item) =>
@@ -499,18 +449,15 @@ export default function Menu() {
     );
   };
 
-  // ======================================================
-  // TOTAL AMOUNT
-  // ======================================================
+  const totalQuantity = cart.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
 
   const totalAmount = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
-
-  // ======================================================
-  // PLACE ORDER
-  // ======================================================
 
   const handlePlaceOrder = (e) => {
     e.preventDefault();
@@ -531,38 +478,25 @@ export default function Menu() {
     }
 
     try {
-      const savedOrders = localStorage.getItem(
-        "foodie-admin-orders"
-      );
-
+      const savedOrders = localStorage.getItem("foodie-admin-orders");
       let existingOrders = [];
 
       try {
-        existingOrders = savedOrders
-          ? JSON.parse(savedOrders)
-          : [];
+        existingOrders = savedOrders ? JSON.parse(savedOrders) : [];
 
         if (!Array.isArray(existingOrders)) {
           existingOrders = [];
         }
       } catch (error) {
-        console.error(
-          "Error reading existing orders:",
-          error
-        );
-
+        console.error("Error reading existing orders:", error);
         existingOrders = [];
       }
 
       const newOrder = {
         id: Date.now(),
-
         customerName: customerName.trim(),
-
         customerPhone: customerPhone.trim(),
-
         paymentMethod: paymentMethod,
-
         items: cart.map((item) => ({
           id: item.id,
           name: item.name,
@@ -570,27 +504,19 @@ export default function Menu() {
           price: item.price,
           preferenceNote: item.note || "",
         })),
-
         totalAmount: Number(totalAmount.toFixed(2)),
-
         status: "Pending",
-
         createdAt: new Date().toISOString(),
       };
 
-      const updatedOrders = [
-        ...existingOrders,
-        newOrder,
-      ];
+      const updatedOrders = [...existingOrders, newOrder];
 
       localStorage.setItem(
         "foodie-admin-orders",
         JSON.stringify(updatedOrders)
       );
 
-      window.dispatchEvent(
-        new Event("admin-orders-updated")
-      );
+      window.dispatchEvent(new Event("admin-orders-updated"));
 
       alert("Order successfully placed!");
 
@@ -600,24 +526,67 @@ export default function Menu() {
       setPaymentMethod("COD");
       setShowOrderBox(false);
     } catch (error) {
-      console.error(
-        "Error saving order:",
-        error
-      );
-
+      console.error("Error saving order:", error);
       alert("Unable to save order.");
     }
   };
 
-  // ======================================================
-  // UI
-  // ======================================================
-
   return (
     <>
-      {/* ==================================================
-          CUSTOMER ORDER BOX
-          ================================================== */}
+      {cart.length > 0 && !showOrderBox && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "90%",
+            maxWidth: "450px",
+            zIndex: 999,
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setShowOrderBox(true)}
+            style={{
+              width: "100%",
+              backgroundColor: "#1f2937",
+              color: "#ffffff",
+              border: "none",
+              borderRadius: "8px",
+              padding: "12px 18px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              fontSize: "0.95rem",
+              fontWeight: "600",
+              cursor: "pointer",
+              boxShadow: "0 6px 16px rgba(0, 0, 0, 0.25)",
+              transition: "all 0.2s ease-in-out",
+            }}
+          >
+            <div
+              style={{
+                width: "26px",
+                height: "26px",
+                borderRadius: "50%",
+                border: "1.5px solid #ffffff",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "0.85rem",
+                fontWeight: "700",
+              }}
+            >
+              {totalQuantity}
+            </div>
+
+            <span style={{ fontSize: "1rem" }}>View your cart</span>
+
+            <span>${totalAmount.toFixed(2)}</span>
+          </button>
+        </div>
+      )}
 
       {showOrderBox && (
         <div
@@ -635,8 +604,6 @@ export default function Menu() {
             overflowY: "auto",
           }}
         >
-          {/* ORDER BOX HEADER */}
-
           <div
             style={{
               display: "flex",
@@ -670,8 +637,6 @@ export default function Menu() {
             </button>
           </div>
 
-          {/* EMPTY CART */}
-
           {cart.length === 0 ? (
             <p
               style={{
@@ -682,8 +647,6 @@ export default function Menu() {
             </p>
           ) : (
             <>
-              {/* CART ITEMS */}
-
               {cart.map((item) => (
                 <div
                   key={item.id}
@@ -693,8 +656,6 @@ export default function Menu() {
                     marginBottom: "1rem",
                   }}
                 >
-                  {/* ITEM NAME + PRICE */}
-
                   <div
                     style={{
                       display: "flex",
@@ -723,8 +684,6 @@ export default function Menu() {
                     </span>
                   </div>
 
-                  {/* QUANTITY */}
-
                   <div
                     style={{
                       marginTop: "0.75rem",
@@ -734,9 +693,7 @@ export default function Menu() {
                   >
                     <button
                       type="button"
-                      onClick={() =>
-                        removeFromCart(item.id)
-                      }
+                      onClick={() => removeFromCart(item.id)}
                       style={{
                         width: "30px",
                         height: "30px",
@@ -763,11 +720,9 @@ export default function Menu() {
                     <button
                       type="button"
                       onClick={() => {
-                        const foodItem =
-                          allFoodItems.find(
-                            (food) =>
-                              food.id === item.id
-                          );
+                        const foodItem = allFoodItems.find(
+                          (food) => food.id === item.id
+                        );
 
                         if (foodItem) {
                           addToCart(foodItem);
@@ -787,17 +742,12 @@ export default function Menu() {
                     </button>
                   </div>
 
-                  {/* SPECIAL NOTE */}
-
                   <input
                     type="text"
                     placeholder="Special note"
                     value={item.note}
                     onChange={(e) =>
-                      updateItemNote(
-                        item.id,
-                        e.target.value
-                      )
+                      updateItemNote(item.id, e.target.value)
                     }
                     style={{
                       width: "100%",
@@ -813,8 +763,6 @@ export default function Menu() {
                 </div>
               ))}
 
-              {/* TOTAL */}
-
               <h3
                 style={{
                   color: "#1f2937",
@@ -825,15 +773,11 @@ export default function Menu() {
                 Total: ${totalAmount.toFixed(2)}
               </h3>
 
-              {/* CUSTOMER NAME */}
-
               <input
                 type="text"
                 placeholder="Your Name"
                 value={customerName}
-                onChange={(e) =>
-                  setCustomerName(e.target.value)
-                }
+                onChange={(e) => setCustomerName(e.target.value)}
                 style={{
                   width: "100%",
                   padding: "0.7rem",
@@ -846,15 +790,11 @@ export default function Menu() {
                 }}
               />
 
-              {/* CUSTOMER PHONE */}
-
               <input
                 type="text"
                 placeholder="Phone Number"
                 value={customerPhone}
-                onChange={(e) =>
-                  setCustomerPhone(e.target.value)
-                }
+                onChange={(e) => setCustomerPhone(e.target.value)}
                 style={{
                   width: "100%",
                   padding: "0.7rem",
@@ -866,10 +806,6 @@ export default function Menu() {
                   color: "#1f2937",
                 }}
               />
-
-              {/* ==================================================
-                  PAYMENT METHOD
-                  ================================================== */}
 
               <div
                 style={{
@@ -885,8 +821,6 @@ export default function Menu() {
                 >
                   Payment Method
                 </h3>
-
-                {/* COD */}
 
                 <label
                   style={{
@@ -904,19 +838,10 @@ export default function Menu() {
                     name="paymentMethod"
                     value="COD"
                     checked={paymentMethod === "COD"}
-                    onChange={(e) =>
-                      setPaymentMethod(
-                        e.target.value
-                      )
-                    }
+                    onChange={(e) => setPaymentMethod(e.target.value)}
                   />
-
-                  <span>
-                    Cash on Delivery (COD)
-                  </span>
+                  <span>Cash on Delivery (COD)</span>
                 </label>
-
-                {/* BKASH */}
 
                 <label
                   style={{
@@ -933,20 +858,11 @@ export default function Menu() {
                     type="radio"
                     name="paymentMethod"
                     value="BKash"
-                    checked={
-                      paymentMethod === "BKash"
-                    }
-                    onChange={(e) =>
-                      setPaymentMethod(
-                        e.target.value
-                      )
-                    }
+                    checked={paymentMethod === "BKash"}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
                   />
-
                   <span>bKash</span>
                 </label>
-
-                {/* NAGAD */}
 
                 <label
                   style={{
@@ -962,21 +878,12 @@ export default function Menu() {
                     type="radio"
                     name="paymentMethod"
                     value="Nagad"
-                    checked={
-                      paymentMethod === "Nagad"
-                    }
-                    onChange={(e) =>
-                      setPaymentMethod(
-                        e.target.value
-                      )
-                    }
+                    checked={paymentMethod === "Nagad"}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
                   />
-
                   <span>Nagad</span>
                 </label>
               </div>
-
-              {/* PLACE ORDER */}
 
               <button
                 type="button"
@@ -1000,15 +907,12 @@ export default function Menu() {
         </div>
       )}
 
-      {/* ==================================================
-          MENU SECTION
-          ================================================== */}
-
       <section
         style={{
           padding: "3rem 0",
           backgroundColor: "#B0BA99",
           minHeight: "100vh",
+          paddingBottom: cart.length > 0 ? "100px" : "3rem",
         }}
         id="menu"
       >
@@ -1019,8 +923,6 @@ export default function Menu() {
             padding: "0 1rem",
           }}
         >
-          {/* MENU TITLE */}
-
           <h2
             style={{
               fontSize: "1.875rem",
@@ -1044,12 +946,9 @@ export default function Menu() {
               fontSize: "0.875rem",
             }}
           >
-            Explore our wide collection of premium
-            handcrafted meals, artisan pizzas, and sweet
-            refreshments.
+            Explore our wide collection of premium handcrafted meals, artisan
+            pizzas, and sweet refreshments.
           </p>
-
-          {/* FOOD GRID */}
 
           <div
             style={{
@@ -1064,22 +963,16 @@ export default function Menu() {
               <div
                 key={item.id}
                 style={{
-                  backgroundColor:
-                    "rgba(255, 255, 255, 0.4)",
+                  backgroundColor: "rgba(255, 255, 255, 0.4)",
                   borderRadius: "0.5rem",
-                  boxShadow:
-                    "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
                   overflow: "hidden",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
                 }}
               >
-                {/* FOOD CONTENT */}
-
                 <div>
-                  {/* IMAGE */}
-
                   <div
                     style={{
                       width: "100%",
@@ -1099,10 +992,7 @@ export default function Menu() {
                       }}
                       loading="lazy"
                     />
-                  
                   </div>
-
-                  {/* FOOD INFORMATION */}
 
                   <div
                     style={{
@@ -1153,8 +1043,6 @@ export default function Menu() {
                   </div>
                 </div>
 
-                {/* ADD TO ORDER BUTTON */}
-
                 <div
                   style={{
                     padding: "0 1rem 1rem 1rem",
@@ -1172,10 +1060,9 @@ export default function Menu() {
                       borderRadius: "4px",
                       cursor: "pointer",
                       fontWeight: "600",
-                      fontSize: "0.85rem",
                     }}
                   >
-                    Add To Order
+                    Add to Cart
                   </button>
                 </div>
               </div>
