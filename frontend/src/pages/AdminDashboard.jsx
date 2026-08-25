@@ -1253,18 +1253,7 @@ export default function Admin() {
                 🍔 Menu Items
               </button>
 
-              <button
-                className={`nav-item ${
-                  activeSection === "payments"
-                    ? "active"
-                    : ""
-                }`}
-                onClick={() =>
-                  changeSection("payments")
-                }
-              >
-                💳 Payments
-              </button>
+         
 
               <button
                 className="back-btn"
@@ -1320,16 +1309,14 @@ export default function Admin() {
                   ☰
                 </button>
 
-                <div className="breadcrumb">
-                  Admin /{" "}
-                  <b>
-                    {activeSection === "menu"
-                      ? "Menu Management"
-                      : activeSection === "orders"
-                      ? "Orders"
-                      : "Payments"}
-                  </b>
-                </div>
+               <div className="breadcrumb">
+  Admin /{" "}
+  <b>
+    {activeSection === "menu"
+      ? "Menu Management"
+      : "Orders"}
+  </b>
+</div>
               </div>
 
               <div className="top-actions">
@@ -2105,52 +2092,7 @@ export default function Admin() {
               </main>
             )}
 
-            {/* ================= PAYMENTS ================= */}
-
-            {activeSection === "payments" && (
-              <main className="main">
-
-                <div className="hero">
-
-                  <div>
-                    <div className="eyebrow">
-                      Restaurant Control Center
-                    </div>
-
-                    <h1>Payments</h1>
-
-                    <p>
-                      Monitor payment information
-                      for your restaurant orders.
-                    </p>
-                  </div>
-
-                </div>
-
-                <section className="panel">
-
-                  <div className="payment">
-
-                    <div className="payment-icon">
-                      💳
-                    </div>
-
-                    <h2>
-                      Payment Management
-                    </h2>
-
-                    <p>
-                      Payment information will
-                      appear here when orders
-                      contain payment data.
-                    </p>
-
-                  </div>
-
-                </section>
-
-              </main>
-            )}
+            
 
           </section>
         </div>
